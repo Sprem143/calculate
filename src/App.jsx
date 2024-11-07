@@ -5,6 +5,8 @@ import './App.css'
 import Button from 'react-bootstrap/Button';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Accordion from 'react-bootstrap/Accordion';
+import Spinner from 'react-bootstrap/Spinner';
+
 function App() {
 
   const [file, setFile] = useState(null);
@@ -13,13 +15,14 @@ function App() {
   const [iPrice,setiPrice]= useState([{}]);
   const [nPrice,setnPrice]= useState([{}]);
   const [products, setProducts]= useState([{}]);
-
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     getfinalsheet();
   },[])
 
   const calculate = async () => {
     try {
+      setLoading(true);
       let result = await fetch('https://calculate-dkpd.onrender.com/calculate', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
@@ -30,7 +33,8 @@ function App() {
       setiPrice(result.iPrice);
       setdPrice(result.dPrice);
       setnPrice(result.nPrice);
-      setNoOfProduct(result.number)
+      setNoOfProduct(result.number);
+      setLoading(false);
     } catch (err) {
       console.log(err)
     }
@@ -41,6 +45,7 @@ function App() {
 
   const getfinalsheet = async () => {
     try {
+      setLoading(true);
       let result = await fetch('https://calculate-dkpd.onrender.com/getsheet', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
@@ -51,7 +56,8 @@ function App() {
       setdPrice(result.dPrice);
       setnPrice(result.nPrice);
       setNoOfProduct(result.number);
-      console.log(result)
+      console.log(result);
+      setLoading(false);
     } catch (err) {
       console.log(err)
     }
@@ -60,7 +66,7 @@ function App() {
     e.preventDefault();
     const formData = new FormData();
     formData.append('file', file);
-
+    setLoading(true);
     try {
       console.log("function called")
       const response = await axios.post('https://calculate-dkpd.onrender.com/upload', formData, {
@@ -74,6 +80,7 @@ function App() {
       alert(`Total Number of Product Uploaded:  ${response.data.number}`);
       setNoOfProduct(response.data.number);
       getfinalsheet();
+      setLoading(false);
     } catch (error) {
       console.error('Error uploading file:', error);
       alert('Failed to upload file');
@@ -82,7 +89,9 @@ function App() {
 
   // ----------download excel sheet--------------
   const downloadExcel = async () => {
+    
     try {
+      setLoading(true);
       const response = await axios({
         url: 'https://calculate-dkpd.onrender.com/download-excel', // Replace with your backend URL
         method: 'GET',
@@ -97,6 +106,7 @@ function App() {
       document.body.appendChild(link);
       link.click();
       link.remove();
+      setLoading(true);
     } catch (error) {
       console.error('Error downloading the file:', error);
     }
@@ -104,7 +114,7 @@ function App() {
 
 
   return (
-    <>
+    <div  style={{ opacity: loading ? 0.5 : 1, color: loading ? 'black': null}}>
       <div>
         <h2>Upload Excel File</h2>
         <form onSubmit={handleSubmit}>
@@ -112,10 +122,20 @@ function App() {
           <button type="submit">Upload</button>
         </form>
       </div>
+
       <Button variant="secondary" className='mt-4' onClick={downloadExcel}>
         Download Excel file
       </Button>
-  
+
+
+    {/* Display spinner while loading */}
+       {loading && ( // Show spinner while loading is true
+        <div className="loading-overlay">
+          <Spinner animation="border" variant="primary" /> {/* Spinner from Bootstrap */}
+        </div>
+      )}
+
+
       <Accordion className='mt-4'>
       <Accordion.Item eventKey="0">
         <Accordion.Header>Number of Product uploaded : {noOfProduct}</Accordion.Header>
@@ -369,7 +389,7 @@ function App() {
       </Accordion.Item>
     </Accordion>
 
-    </>
+    </div>
   )
 }
 
