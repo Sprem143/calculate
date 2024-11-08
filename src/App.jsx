@@ -16,6 +16,7 @@ function App() {
   const [nPrice,setnPrice]= useState([{}]);
   const [products, setProducts]= useState([{}]);
   const [loading, setLoading] = useState(false);
+  const [percentage,setPercentage]=useState(75);
   useEffect(() => {
     getfinalsheet();
   },[])
@@ -23,9 +24,10 @@ function App() {
   const calculate = async () => {
     try {
       setLoading(true);
-      let result = await fetch('https://calculate-dkpd.onrender.com/calculate', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
+      let result = await fetch('http://localhost:5000/calculate', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json' },
+        body:JSON.stringify({percentage:percentage})
       })
       result=await result.json();
       console.log(result);
@@ -46,7 +48,7 @@ function App() {
   const getfinalsheet = async () => {
     try {
       setLoading(true);
-      let result = await fetch('https://calculate-dkpd.onrender.com/getsheet', {
+      let result = await fetch('http://localhost:5000/getsheet', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
       });
@@ -69,7 +71,7 @@ function App() {
     setLoading(true);
     try {
       console.log("function called")
-      const response = await axios.post('https://calculate-dkpd.onrender.com/upload', formData, {
+      const response = await axios.post('http://localhost:5000/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -93,7 +95,7 @@ function App() {
     try {
       setLoading(true);
       const response = await axios({
-        url: 'https://calculate-dkpd.onrender.com/download-excel', // Replace with your backend URL
+        url: 'http://localhost:5000/download-excel', // Replace with your backend URL
         method: 'GET',
         responseType: 'blob', // Important to get the response as a blob (binary data)
       });
@@ -115,17 +117,18 @@ function App() {
 
   return (
     <div  style={{ opacity: loading ? 0.5 : 1, color: loading ? 'black': null}}>
+
       <div>
         <h2>Upload Excel File</h2>
         <form onSubmit={handleSubmit}>
           <input type="file" onChange={handleFileChange} accept=".xlsx, .xls" />
-          <button type="submit">Upload</button>
+          <input className='ps-3' style={{height:'45px', width:'60px'}} type="number" value={percentage} onChange={(e)=>setPercentage(e.target.value)} />
+          <button className='ms-4' type="submit">Upload</button>
+          <button className='mt-4 ms-4' onClick={downloadExcel}>
+        Download
+      </button>
         </form>
       </div>
-
-      <Button variant="secondary" className='mt-4' onClick={downloadExcel}>
-        Download Excel file
-      </Button>
 
 
     {/* Display spinner while loading */}
