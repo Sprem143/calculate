@@ -24,7 +24,7 @@ function App() {
   const calculate = async () => {
     try {
       setLoading(true);
-      let result = await fetch('http://localhost:5000/calculate', {
+      let result = await fetch('https://calculate-dkpd.onrender.com/calculate', {
         method: 'POST',
         headers: {'Content-Type': 'application/json' },
         body:JSON.stringify({percentage:percentage})
@@ -48,7 +48,7 @@ function App() {
   const getfinalsheet = async () => {
     try {
       setLoading(true);
-      let result = await fetch('http://localhost:5000/getsheet', {
+      let result = await fetch('https://calculate-dkpd.onrender.com/getsheet', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
       });
@@ -71,7 +71,7 @@ function App() {
     setLoading(true);
     try {
       console.log("function called")
-      const response = await axios.post('http://localhost:5000/upload', formData, {
+      const response = await axios.post('https://calculate-dkpd.onrender.com/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -95,7 +95,7 @@ function App() {
     try {
       setLoading(true);
       const response = await axios({
-        url: 'http://localhost:5000/download-excel', // Replace with your backend URL
+        url: 'https://calculate-dkpd.onrender.com/download-excel', // Replace with your backend URL
         method: 'GET',
         responseType: 'blob', // Important to get the response as a blob (binary data)
       });
