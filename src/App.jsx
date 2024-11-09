@@ -32,13 +32,13 @@ function App() {
         body:JSON.stringify({percentage:percentage,sp:sp})
       })
       result=await result.json();
-      console.log(result);
       setProducts(result.products)
       setiPrice(result.iPrice);
       setdPrice(result.dPrice);
       setnPrice(result.nPrice);
       setNoOfProduct(result.number);
-      setLoading(false);
+      setLoading(false);  
+        downloadExcel();
     } catch (err) {
       console.log(err)
     }
@@ -81,7 +81,6 @@ function App() {
       if (response.data.number > 0) {
         calculate();
       }
-      alert(`Total Number of Product Uploaded:  ${response.data.number}`);
       setNoOfProduct(response.data.number);
       getfinalsheet();
       setLoading(false);
@@ -93,7 +92,7 @@ function App() {
 
   // ----------download excel sheet--------------
   const downloadExcel = async () => {
-    
+    console.log("Downloading start")
     try {
       setLoading(true);
       const response = await axios({

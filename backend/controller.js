@@ -105,6 +105,7 @@ exports.calculate=async(req,res)=>{
     if (!data || data.length === 0) {
       return res.status(404).send('No data found.');
     }
+
     const jsondata = data.map((item) => (
       {
         // UPC:item.UPC
@@ -123,19 +124,20 @@ exports.calculate=async(req,res)=>{
         'Amazon Fee':((100*(item['Current Products Cost'] + item['Vendor Shipping'] + item.Fulfillment + item['Min Profit $- Calculations']))/(100-(100*item['Amazon Fees%']))*item['Amazon Fees%']).toFixed(2),
         'Net Profit':item['Min Profit $- Calculations'].toFixed(2),
         Min:((100*(item['Current Products Cost'] + item['Vendor Shipping'] + item.Fulfillment + item['Min Profit $- Calculations']))/(100-(100*item['Amazon Fees%']))-item['Shipping Template used']).toFixed(2),
-        Max:(((item['Current Products Cost'] + item['Vendor Shipping'] + item.Fulfillment) * 1.75)-item['Shipping Template used']).toFixed(2),
-        'Selling Price':((item['Current Products Cost'] + item['Vendor Shipping'] + item.Fulfillment)*1.3).toFixed(2),
-        'Selling - Min Price for Checking':(((item['Current Products Cost'] + item['Vendor Shipping'] + item.Fulfillment)*1.3) - ((100*(item['Current Products Cost'] + item['Vendor Shipping'] + item.Fulfillment + item['Min Profit $- Calculations']))/(100-(100*item['Amazon Fees%']))-item['Shipping Template used'])).toFixed(2),
-        'Max Price - Selling Price':((((item['Current Products Cost'] + item['Vendor Shipping'] + item.Fulfillment) * 1.75)-item['Shipping Template used'])- ((item['Current Products Cost'] + item['Vendor Shipping'] + item.Fulfillment)*1.3)).toFixed(2),
+        Max:(((item['Current Products Cost'] + item['Vendor Shipping'] + item.Fulfillment) * (1+ (per/100)))-item['Shipping Template used']).toFixed(2),
+        'Selling Price':((item['Current Products Cost'] + item['Vendor Shipping'] + item.Fulfillment)*(1+(sp/100))).toFixed(2),
+        'Selling - Min Price for Checking':(((item['Current Products Cost'] + item['Vendor Shipping'] + item.Fulfillment)*(1+(sp/100))) - ((100*(item['Current Products Cost'] + item['Vendor Shipping'] + item.Fulfillment + item['Min Profit $- Calculations']))/(100-(100*item['Amazon Fees%']))-item['Shipping Template used'])).toFixed(2),
+        'Max Price - Selling Price':((((item['Current Products Cost'] + item['Vendor Shipping'] + item.Fulfillment) *(1+ (per/100)))-item['Shipping Template used'])- ((item['Current Products Cost'] + item['Vendor Shipping'] + item.Fulfillment)*(1+(sp/100)))).toFixed(2),
         'Price difference with new-old':(item['Current Products Cost']-item['Original Product Cost']).toFixed(2)
       }
     ))
+
   await FinalSheet.deleteMany({});
    const result= await finalsheet.insertMany(jsondata);
    const dPrice= result.filter((d)=> d['Price difference with new-old']<0);
    const iPrice =result.filter((d)=> d['Price difference with new-old']>0);
    const nPrice= result.filter((d)=> d['Price difference with new-old']==0);
-   res.status(200).json({products:result, dPrice:dPrice,iPrice:iPrice,nPrice:nPrice,number:result.length})
+   res.status(200).json({products:result, dPrice:dPrice,iPrice:iPrice,nPrice:nPrice,number:result.length,status:true})
   } catch (err) {
     console.log(err);
   }
