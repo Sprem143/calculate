@@ -109,7 +109,7 @@ function App() {
       document.body.appendChild(link);
       link.click();
       link.remove();
-      setLoading(true);
+      setLoading(false);
     } catch (error) {
       console.error('Error downloading the file:', error);
     }
