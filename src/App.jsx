@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react'
 import Table from 'react-bootstrap/Table';
 import axios from 'axios';
 import './App.css'
-import Button from 'react-bootstrap/Button';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Accordion from 'react-bootstrap/Accordion';
 import Spinner from 'react-bootstrap/Spinner';
+import Form from 'react-bootstrap/Form';
+import InputGroup from 'react-bootstrap/InputGroup';
 
 function App() {
 
@@ -17,6 +18,7 @@ function App() {
   const [products, setProducts]= useState([{}]);
   const [loading, setLoading] = useState(false);
   const [percentage,setPercentage]=useState(75);
+  const [sp,setSp]=useState(30);
   useEffect(() => {
     getfinalsheet();
   },[])
@@ -27,7 +29,7 @@ function App() {
       let result = await fetch('https://calculate-dkpd.onrender.com/calculate', {
         method: 'POST',
         headers: {'Content-Type': 'application/json' },
-        body:JSON.stringify({percentage:percentage})
+        body:JSON.stringify({percentage:percentage,sp:sp})
       })
       result=await result.json();
       console.log(result);
@@ -122,13 +124,38 @@ function App() {
         <h2>Upload Excel File</h2>
         <form onSubmit={handleSubmit}>
           <input type="file" onChange={handleFileChange} accept=".xlsx, .xls" />
-          <input className='ps-3' style={{height:'45px', width:'60px'}} type="number" value={percentage} onChange={(e)=>setPercentage(e.target.value)} />
           <button className='ms-4' type="submit">Upload</button>
           <button className='mt-4 ms-4' onClick={downloadExcel}>
         Download
       </button>
         </form>
       </div>
+      <InputGroup className="mb-3 mt-4" style={{width:'200px'}}>
+        <InputGroup.Text id="inputGroup-sizing-default">
+         Max Price %
+        </InputGroup.Text>
+        <Form.Control
+          aria-label="Default"
+          aria-describedby="inputGroup-sizing-default"
+          value={percentage}
+          style={{width:'60px'}}
+          onChange={(e)=>setPercentage(e.target.value)}
+        />
+      </InputGroup>
+
+      <InputGroup className="mb-3 mt-4" style={{width:'200px'}}>
+        <InputGroup.Text id="inputGroup-sizing-default">
+         Selling Price %
+        </InputGroup.Text>
+        <Form.Control
+          aria-label="Default"
+          aria-describedby="inputGroup-sizing-default"
+          value={sp}
+          style={{width:'60px'}}
+          onChange={(e)=>setSp(e.target.value)}
+        />
+      </InputGroup>
+
 
 
     {/* Display spinner while loading */}
